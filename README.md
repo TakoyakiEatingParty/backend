@@ -1,4 +1,4 @@
-# Magicbox backend
+# Magicbox(仮) backend
 
 ## 概要
 自動デプロイサービスのバックエンド機能の開発を行う。
