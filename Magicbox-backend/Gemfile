@@ -37,9 +37,7 @@ gem "bootsnap", require: false
 gem "rack-cors"
 
 # github oauth
-gem "omniauth-github"
-gem "omniauth"
-gem "omniauth-rails_csrf_protection"
+gem "httparty"
 gem "dotenv-rails"
 
 group :development, :test do
