@@ -1,0 +1,26 @@
+name: EC2 auto deploy
+
+on:
+ pull_request:
+   branches: [ main ]
+   types: [closed]
+
+ workflow_dispatch:
+
+jobs:
+ build:
+   runs-on: ubuntu-latest
+   steps:
+
+     # BranchをCheckout
+     - name: Checkout
+       uses: actions/checkout@v2
+
+     # デプロイする
+     - name: Deploy
+       run: |
+       
+         # SSH接続して、git pullする
+         echo "${{ secrets.GIT_PRIVATE_KEY }}" > private_key
+         chmod 600 private_key
+         ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd /develop/magicbox && git fetch --prune && git checkout main && git pull origin main"
