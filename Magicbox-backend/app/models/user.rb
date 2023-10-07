@@ -3,7 +3,6 @@ class User < ApplicationRecord
     uid = auth_hash[:uid]
     nickname = auth_hash[:name]
     image_url = auth_hash[:image_url]
-    p auth_hash
     User.find_or_create_by!(provider: 'github', uid: uid) do |user|
       user.provider = 'github'
       user.uid = uid

@@ -10,7 +10,6 @@ class SessionController < ApplicationController
     # 帰ってきたcodeを使ってaccess_tokenを取得する
     auth_code = params[:code]
     access_token = github_access_token(auth_code)
-    p access_token
     # Github APIを叩いてユーザー情報を取得する
     user_info = fetch_github_user_info(access_token)
 
@@ -20,10 +19,24 @@ class SessionController < ApplicationController
     user = User.find_or_create_from_auth_hash!(user_info)
 
     # ユーザー情報をもとに、JWTを生成する
-    jwt_payload = { user_id: user.id }
+    jwt_payload = { user_id: user.id, jti: SecureRandom.uuid, exp: 1.week.from_now.to_i }
     jwt_token = JWT.encode(jwt_payload, Rails.application.credentials.secret_key_base, 'HS256')
 
+    # JWTを保存する
+    JwtToken.create!(jti: jwt_payload[:jti], exp: Time.at(jwt_payload[:exp]))
     redirect_to ENV.fetch('FRONTEND_URL', nil) + "/?token=#{jwt_token}"
+  end
+
+  def destroy
+    jti = decoded_jwt_payload['jti']
+
+    token = JwtToken.find_by(jti:)
+    if token
+      token.destroy
+      render json: { message: 'Logged out successfully' }, status: :ok
+    else
+      render json: { error: 'Token not found' }, status: :not_found
+    end
   end
 
   private
@@ -38,9 +51,9 @@ class SessionController < ApplicationController
                                code: auth_code
                              },
                              debug_output: $stdout)
-    return response.parsed_response['access_token'] if response.code == 200
+    return nil unless response.code == 200
 
-    nil
+    response.parsed_response['access_token']
   end
 
   def fetch_github_user_info(access_token)
@@ -60,5 +73,13 @@ class SessionController < ApplicationController
       image_url: user_info['avatar_url'],
       email: user_info['email']
     }
+  end
+
+  def decoded_jwt_payload
+    authorization = request.headers['Authorization']
+    token = authorization.split('Bearer ').last
+    JWT.decode(token, Rails.application.credentials.secret_key_base, true, algorithm: 'HS256').first
+  rescue StandardError
+    {}
   end
 end
