@@ -37,6 +37,7 @@ gem "bootsnap", require: false
 gem "rack-cors"
 
 # github oauth
+gem "jwt"
 gem "httparty"
 gem "dotenv-rails"
 
