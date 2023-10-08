@@ -10,17 +10,19 @@ on:
 jobs:
  build:
    runs-on: ubuntu-latest
-   steps:
 
+   steps:
      # BranchをCheckout
      - name: Checkout
        uses: actions/checkout@v2
 
      # デプロイする
      - name: Deploy
-       run: |
-       
-         # SSH接続して、git pullする
-         echo "${{ secrets.GIT_PRIVATE_KEY }}" > private_key
-         chmod 600 private_key
-         ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd ~/develop/magicbox && git fetch --prune && git checkout main && git pull origin main"
+       uses: appleboy/ssh-action@master
+       with:
+          host: ${{ secrets.EC2_HOST_NAME }}
+          username: ${{ secrets.EC2_USER_NAME }}
+          key: ${{ secrets.GIT_PRIVATE_KEY }}
+          script: |
+            cd ~/develop/magicbox
+            git pull origin main
