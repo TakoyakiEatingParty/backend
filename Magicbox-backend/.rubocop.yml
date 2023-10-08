@@ -1,0 +1,40 @@
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  Exclude:
+    - db/migrate/*
+    - db/schema.rb
+    - config/*
+    - config/**/*
+    - vendor/**/*
+    - tmp/**/*
+    - bin/*
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/IndentationStyle:
+  EnforedStyle: spaces
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+    - lib/tasks/auto_annotate_models.rake
+
+Metrics/AbcSize:
+  # The ABC size is a calculated magnitude, so this number can be a Fixnum or
+  # a Float.
+  Max: 30
+
+MethodLength:
+  CountComments: false # count full line comments?
+  Max: 20
+
+ParenthesesAroundCondition:
+  AllowSafeAssignment: false
+
+AssignmentInCondition:
+  AllowSafeAssignment: false
