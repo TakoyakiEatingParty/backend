@@ -17,7 +17,8 @@ class SessionController < ApplicationController
     raise 'Unable to authenticate with GitHub' unless user_info.present?
 
     user = User.find_or_create_from_auth_hash!(user_info)
-
+	user.github_token = access_token
+	user.save!
     # ユーザー情報をもとに、JWTを生成する
     jwt_payload = { user_id: user.id, jti: SecureRandom.uuid, exp: 1.week.from_now.to_i }
     jwt_token = JWT.encode(jwt_payload, Rails.application.credentials.secret_key_base, 'HS256')

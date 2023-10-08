@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  attr_encrypted :github_token, key: ENV.fetch('ENCRYPTION_KEY', nil).byteslice(0..31)
   def self.find_or_create_from_auth_hash!(auth_hash)
     uid = auth_hash[:uid]
     nickname = auth_hash[:name]
