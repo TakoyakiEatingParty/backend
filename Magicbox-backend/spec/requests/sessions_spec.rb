@@ -33,9 +33,9 @@ RSpec.describe SessionController, type: :controller do
         end.to change(User, :count).by(1)
       end
 
-      it "creates a JWT for the user" do
+      it "redirect to root" do
         post :github_callback, params: { code: 'fake_code' }
-        expect(response.location).to match(/token=/)
+        expect(response.location).to match(/#{ENV.fetch('FRONTEND_URL', nil)}/)
       end
     end
 
@@ -54,10 +54,12 @@ RSpec.describe SessionController, type: :controller do
 
   describe "DELETE #destroy" do
     let!(:user) { create(:user) }
-    let!(:token) { create(:jwt_token) }
+    let(:jwt_payload) { { user_id: user.id, jti: SecureRandom.uuid, exp: 1.week.from_now.to_i } }
+    let!(:token) { JWT.encode(jwt_payload, Rails.application.credentials.secret_key_base, 'HS256') }
 
     before do
-      request.headers['Authorization'] = "Bearer #{token.jti}"
+      create(:jwt_token, jti: jwt_payload[:jti], exp: Time.at(jwt_payload[:exp]))
+      request.headers['Authorization'] = "Bearer #{token}" # ここでエンコードされたJWTをセットします。
     end
 
     context "when the token exists" do

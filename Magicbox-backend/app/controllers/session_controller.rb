@@ -24,7 +24,16 @@ class SessionController < ApplicationController
 
     # JWTを保存する
     JwtToken.create!(jti: jwt_payload[:jti], exp: Time.at(jwt_payload[:exp]))
-    redirect_to ENV.fetch('FRONTEND_URL', nil) + "/?token=#{jwt_token}", allow_other_host: true
+    # JWTトークンをセキュアなCookieに保存する
+    cookies.signed[:user_token] = {
+      value: jwt_token,
+      httponly: true,
+      secure: Rails.env.production?, # 本番環境のみHTTPSを強制する
+      expires: 1.week.from_now
+    }
+
+    # フロントエンドにリダイレクトするだけで、トークンはクエリパラメータに含まないようにする
+    redirect_to ENV.fetch('FRONTEND_URL', nil), allow_other_host: true
   end
 
   def destroy

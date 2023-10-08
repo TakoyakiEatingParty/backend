@@ -8,8 +8,7 @@ module Authenticable
   private
 
   def authenticate_request!
-    authorization_header = request.headers['Authorization']
-    token = authorization_header.split('Bearer ').last if authorization_header
+    token = cookies.signed[:user_token]
     raise 'Token is missing' unless token
 
     decoded_token = JWT.decode(token, Rails.application.credentials.secret_key_base, true, { algorithm: 'HS256' })
