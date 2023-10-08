@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   # 認証関連のルーティング
   get  '/auth/github', to: 'session#github_auth'
   get  '/auth/github/callback', to: 'session#github_callback'
-  delete '/logout', to: 'sessions#destroy'
+  delete '/logout', to: 'session#destroy'
   #　api関連のルーティング
   namespace :api do
     namespace :v1 do

@@ -24,14 +24,13 @@ class SessionController < ApplicationController
 
     # JWTを保存する
     JwtToken.create!(jti: jwt_payload[:jti], exp: Time.at(jwt_payload[:exp]))
-    redirect_to ENV.fetch('FRONTEND_URL', nil) + "/?token=#{jwt_token}"
+    redirect_to ENV.fetch('FRONTEND_URL', nil) + "/?token=#{jwt_token}", allow_other_host: true
   end
 
   def destroy
     jti = decoded_jwt_payload['jti']
-
     token = JwtToken.find_by(jti:)
-    if token
+    if token.present?
       token.destroy
       render json: { message: 'Logged out successfully' }, status: :ok
     else
