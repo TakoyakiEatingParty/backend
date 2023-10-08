@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_06_042902) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_08_043927) do
+  create_table "jwt_tokens", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "jti", null: false
+    t.datetime "exp", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["jti"], name: "index_jwt_tokens_on_jti", unique: true
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "provider", default: "github", null: false
     t.string "uid", null: false
@@ -18,6 +26,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_06_042902) do
     t.string "image_url", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "encrypted_github_token"
+    t.string "encrypted_github_token_iv"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
